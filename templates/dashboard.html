@@ -1,121 +1,339 @@
 {% extends "base.html" %}
 
-{% block title %}
-Anomaly Watch
-{% endblock %}
+{% block title %}Anomaly Watch — Market Surveillance{% endblock %}
 
 {% block content %}
 
-<nav class="navbar bg-dark navbar-dark">
-    <div class="container">
-        <span class="navbar-brand fw-bold">
-            📈 Anomaly Watch
-        </span>
+<!-- ═══════════════════════════════════════════════════════════════════
+     TERMINAL HEADER
+     ═══════════════════════════════════════════════════════════════════ -->
+<header class="terminal-header" id="terminalHeader">
+    <div class="header-top">
+        <div class="header-brand">
+            <span class="brand-name">ANOMALY WATCH</span>
+            <span class="brand-sep">/</span>
+            <span class="brand-sub">NSE MARKET SURVEILLANCE</span>
+        </div>
+        <div class="header-right">
+            <span class="header-index" id="headerNifty">
+                <span class="index-label">NIFTY 50</span>
+                <span class="index-value mono" id="niftyValue">—</span>
+                <span class="index-change mono" id="niftyChange">—</span>
+            </span>
+            <span class="header-sep">│</span>
+            <span class="header-index" id="headerSensex">
+                <span class="index-label">SENSEX</span>
+                <span class="index-value mono" id="sensexValue">—</span>
+                <span class="index-change mono" id="sensexChange">—</span>
+            </span>
+            <span class="header-sep">│</span>
+            <span class="system-status">
+                <span class="status-dot online"></span>
+                <span class="status-text">SYSTEM ONLINE</span>
+            </span>
+        </div>
     </div>
-</nav>
-
-<div class="container py-4">
-
-    <div class="mb-4">
-        <h1>Stock Anomaly Detection</h1>
-        <p class="text-muted">
-            Early-warning screening for unusual trading activity.
-        </p>
+    <!-- Ticker strip -->
+    <div class="ticker-strip" id="tickerStrip">
+        <!-- JS fills this -->
     </div>
+</header>
 
-    <!-- Stock selector -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MAIN LAYOUT: SIDEBAR + CONTENT
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="terminal-layout">
 
-    <div class="mb-4">
-        <label class="form-label fw-bold">Select Stock</label>
+    <!-- ───────────────────────────────────────────────────────────────
+         SIDEBAR
+         ─────────────────────────────────────────────────────────────── -->
+    <aside class="terminal-sidebar" id="sidebar">
 
-        <select id="stockSelector" class="form-select">
-        </select>
-    </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">NAVIGATION</div>
+            <button class="sidebar-nav active" data-view="overview">
+                <span class="nav-dot"></span> OVERVIEW
+            </button>
+            <button class="sidebar-nav" data-view="alerts">
+                <span class="nav-dot"></span> ALERTS
+                <span class="nav-badge" id="alertBadge">0</span>
+            </button>
+            <button class="sidebar-nav" data-view="config">
+                <span class="nav-dot"></span> CONFIGURATION
+            </button>
+        </div>
 
-    <!-- Summary cards -->
+        <div class="sidebar-divider"></div>
 
-    <div class="row g-3 mb-4">
+        <div class="sidebar-section">
+            <div class="sidebar-label">WATCHLIST</div>
+            <div id="watchlist">
+                <!-- JS fills this -->
+            </div>
+        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Current Price</p>
-                    <h3 id="currentPrice">-</h3>
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-label">ALERTS</div>
+            <div id="sidebarAlerts" class="sidebar-alerts">
+                <!-- JS fills this -->
+            </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section sidebar-system">
+            <div class="sidebar-label">SYSTEM</div>
+            <div class="system-line">
+                <span class="status-dot online"></span>
+                <span>DATA CONNECTED</span>
+            </div>
+            <div class="system-line">
+                <span class="status-dot online"></span>
+                <span>MODEL ACTIVE</span>
+            </div>
+            <div class="system-line muted">
+                METHOD: ROLLING Z-SCORE
+            </div>
+            <div class="system-line muted">
+                SOURCE: MOCK DATA
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ───────────────────────────────────────────────────────────────
+         MAIN CONTENT
+         ─────────────────────────────────────────────────────────────── -->
+    <main class="terminal-main" id="mainContent">
+
+        <!-- ═══════════ VIEW: OVERVIEW (default) ═══════════ -->
+        <div class="view-panel" id="viewOverview">
+
+            <!-- Stock title bar -->
+            <div class="stock-title-bar">
+                <div class="stock-title">
+                    <span class="stock-symbol mono" id="activeSymbol">RELIANCE</span>
+                    <span class="stock-name muted" id="activeName">Reliance Industries Ltd</span>
+                </div>
+                <div class="stock-title-right">
+                    <span class="risk-badge" id="riskBadge">—</span>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Anomalies Detected</p>
-                    <h3 id="anomalyCount">-</h3>
+            <!-- Market snapshot metrics -->
+            <div class="metrics-row" id="metricsRow">
+                <div class="metric-panel">
+                    <div class="metric-label">CURRENT PRICE</div>
+                    <div class="metric-value mono" id="metricPrice">—</div>
+                </div>
+                <div class="metric-panel">
+                    <div class="metric-label">PRICE CHANGE</div>
+                    <div class="metric-value mono" id="metricChange">—</div>
+                </div>
+                <div class="metric-panel">
+                    <div class="metric-label">VOLUME TODAY</div>
+                    <div class="metric-value mono" id="metricVolume">—</div>
+                </div>
+                <div class="metric-panel">
+                    <div class="metric-label">ANOMALIES</div>
+                    <div class="metric-value mono" id="metricAnomalies">—</div>
+                </div>
+                <div class="metric-panel">
+                    <div class="metric-label">DETECTION</div>
+                    <div class="metric-value mono" id="metricThreshold">—</div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Status</p>
-                    <h3 id="status">-</h3>
+            <!-- Charts grid -->
+            <div class="charts-grid">
+                <div class="terminal-panel chart-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">PRICE ACTIVITY</span>
+                        <span class="panel-badge orange">PRICE</span>
+                    </div>
+                    <div class="chart-container" id="priceChart"></div>
+                </div>
+                <div class="terminal-panel chart-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">VOLUME ACTIVITY</span>
+                        <span class="panel-badge teal">VOLUME</span>
+                    </div>
+                    <div class="chart-container" id="volumeChart"></div>
                 </div>
             </div>
-        </div>
 
-    </div>
-
-    <!-- Price chart -->
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5>Price Movement</h5>
-            <div id="priceChart"></div>
-        </div>
-    </div>
-
-    <!-- Volume chart -->
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5>Trading Volume</h5>
-            <div id="volumeChart"></div>
-        </div>
-    </div>
-
-    <!-- Anomaly table -->
-
-    <div class="card shadow-sm">
-
-        <div class="card-body">
-
-            <h5 class="mb-3">
-                Flagged Events
-            </h5>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover">
-
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Metric</th>
-                            <th>Z-Score</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="anomalyTable">
-                    </tbody>
-
-                </table>
-
+            <!-- Z-Score chart — full width -->
+            <div class="terminal-panel chart-panel chart-full">
+                <div class="panel-header">
+                    <span class="panel-title">Z-SCORE SIGNAL</span>
+                    <span class="panel-badge muted-badge">THRESHOLD |Z| &gt; <span id="chartThresholdLabel">2.5</span>σ</span>
+                </div>
+                <div class="chart-container" id="zscoreChart"></div>
             </div>
 
+            <!-- Anomaly events table -->
+            <div class="terminal-panel">
+                <div class="panel-header">
+                    <span class="panel-title">ANOMALY EVENTS</span>
+                    <span class="panel-badge muted-badge"><span id="eventCount">0</span> EVENTS</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="terminal-table" id="anomalyTableEl">
+                        <thead>
+                            <tr>
+                                <th>TIME</th>
+                                <th>SYMBOL</th>
+                                <th>SIGNAL</th>
+                                <th>Z-SCORE</th>
+                                <th>SEVERITY</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomalyTableBody">
+                        </tbody>
+                    </table>
+                    <div class="table-empty" id="tableEmpty" style="display:none;">
+                        No anomalies detected at current threshold.
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /viewOverview -->
+
+        <!-- ═══════════ VIEW: ALERTS ═══════════ -->
+        <div class="view-panel" id="viewAlerts" style="display:none;">
+            <div class="stock-title-bar">
+                <div class="stock-title">
+                    <span class="stock-symbol mono">ALL ALERTS</span>
+                    <span class="stock-name muted">Cross-market anomaly events</span>
+                </div>
+            </div>
+            <div class="terminal-panel">
+                <div class="panel-header">
+                    <span class="panel-title">GLOBAL ANOMALY FEED</span>
+                    <span class="panel-badge muted-badge"><span id="globalEventCount">0</span> EVENTS</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>SYMBOL</th>
+                                <th>SIGNAL</th>
+                                <th>Z-SCORE</th>
+                                <th>SEVERITY</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="globalAnomalyBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- /viewAlerts -->
+
+        <!-- ═══════════ VIEW: CONFIGURATION ═══════════ -->
+        <div class="view-panel" id="viewConfig" style="display:none;">
+            <div class="stock-title-bar">
+                <div class="stock-title">
+                    <span class="stock-symbol mono">DETECTION CONFIGURATION</span>
+                    <span class="stock-name muted">Adjust scan parameters</span>
+                </div>
+            </div>
+            <div class="config-grid">
+                <div class="terminal-panel config-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">SCAN PARAMETERS</span>
+                    </div>
+                    <div class="config-body">
+                        <div class="config-field">
+                            <label class="config-label" for="cfgWindow">WINDOW (DAYS)</label>
+                            <input type="number" id="cfgWindow" class="config-input mono" value="30" min="7" max="90">
+                        </div>
+                        <div class="config-field">
+                            <label class="config-label" for="cfgThreshold">Z-SCORE THRESHOLD (σ)</label>
+                            <input type="number" id="cfgThreshold" class="config-input mono" value="2.5" min="1.0" max="6.0" step="0.1">
+                        </div>
+                        <div class="config-field">
+                            <label class="config-label">METRICS</label>
+                            <div class="config-checks">
+                                <label class="config-check">
+                                    <input type="checkbox" id="cfgPrice" checked> PRICE
+                                </label>
+                                <label class="config-check">
+                                    <input type="checkbox" id="cfgVolume" checked> VOLUME
+                                </label>
+                            </div>
+                        </div>
+                        <div class="config-field">
+                            <label class="config-label" for="cfgSymbol">TARGET</label>
+                            <select id="cfgSymbol" class="config-input mono">
+                                <option value="">ALL STOCKS</option>
+                            </select>
+                        </div>
+                        <button class="scan-btn" id="runScanBtn">RUN SCAN</button>
+                        <div class="scan-result" id="scanResult" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="terminal-panel config-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">METHOD INFO</span>
+                    </div>
+                    <div class="config-body method-info">
+                        <div class="method-row"><span class="muted">DETECTION METHOD</span><span class="mono">ROLLING Z-SCORE</span></div>
+                        <div class="method-row"><span class="muted">DATA SOURCE</span><span class="mono">MOCK DATA</span></div>
+                        <div class="method-row"><span class="muted">FORMULA</span><span class="mono">Z = (x − μ) / σ</span></div>
+                        <div class="method-row"><span class="muted">SEVERITY BANDS</span></div>
+                        <div class="severity-legend">
+                            <span class="sev-chip medium">MEDIUM</span> 2.5σ – 3.0σ
+                        </div>
+                        <div class="severity-legend">
+                            <span class="sev-chip high">HIGH</span> 3.0σ – 4.0σ
+                        </div>
+                        <div class="severity-legend">
+                            <span class="sev-chip critical">CRITICAL</span> &gt; 4.0σ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /viewConfig -->
+
+    </main>
+
+</div><!-- /terminal-layout -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     INVESTIGATION PANEL (slide-in drawer)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="investigation-overlay" id="investigationOverlay">
+    <div class="investigation-panel" id="investigationPanel">
+        <div class="inv-header">
+            <span class="panel-title">ANOMALY INVESTIGATION</span>
+            <button class="inv-close" id="invClose">&times;</button>
         </div>
-
+        <div class="inv-body" id="invBody">
+            <!-- JS fills this -->
+        </div>
     </div>
-
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     BOTTOM STATUS BAR
+     ═══════════════════════════════════════════════════════════════════ -->
+<footer class="status-bar" id="statusBar">
+    <span>DATA: <span class="mono">MOCK</span></span>
+    <span class="status-sep">│</span>
+    <span>WINDOW: <span class="mono" id="statusWindow">30D</span></span>
+    <span class="status-sep">│</span>
+    <span>METHOD: <span class="mono">ROLLING Z-SCORE</span></span>
+    <span class="status-sep">│</span>
+    <span>THRESHOLD: <span class="mono" id="statusThreshold">|Z| &gt; 2.5σ</span></span>
+    <span class="status-sep">│</span>
+    <span>MODEL: <span class="status-dot online" style="margin-right:4px;"></span><span class="mono">ACTIVE</span></span>
+    <span class="status-sep">│</span>
+    <span>LAST UPDATE: <span class="mono" id="statusClock">--:--:--</span></span>
+</footer>
 
 {% endblock %}
