@@ -1,0 +1,12 @@
+body {
+    background: #f8f9fa;
+}
+
+.card {
+    border: none;
+}
+
+#priceChart,
+#volumeChart {
+    width: 100%;
+}
