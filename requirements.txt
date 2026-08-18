@@ -1,2 +1,4 @@
 flask>=3.0
-gunicorn
+pandas
+numpy
+yfinance
